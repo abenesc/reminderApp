@@ -7,3 +7,7 @@ Nov 16
 Cedrick Abenes
 1. Watched the passport tutorial video
 2. worked on local authentication for the app - not finished
+
+Nov 23
+Cedrick Abenes
+1. worked on local authentication - still not finished
