@@ -4,6 +4,8 @@ const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const reminderController = require("./controller/reminder_controller");
 const authController = require("./controller/auth_controller");
+const session = require("express-session");
+const { ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -12,12 +14,32 @@ app.use(express.urlencoded({ extended: false }));
 app.use(ejsLayouts);
 
 app.set("view engine", "ejs");
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
+
+const passport = require("./middleware/passport");
+// Middleware for express
+app.use(express.json());
+app.use(ejsLayouts);
+app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes start here
 
-app.get("/reminders", reminderController.list);
+app.get("/reminders", ensureAuthenticated, reminderController.list);
 
-app.get("/reminder/new", reminderController.new);
+app.get("/reminder/new", ensureAuthenticated, reminderController.new);
 
 app.get("/reminder/:id", reminderController.listOne);
 
